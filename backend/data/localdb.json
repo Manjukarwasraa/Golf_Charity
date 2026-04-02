@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "id": "a1bd96b0-c36d-44e3-9521-4904cd31142c",
+      "charity": "Fairway Futures Trust",
+      "subscriptionStatus": "inactive",
+      "name": "QA User",
+      "email": "qa.95a4a1fa@example.com",
+      "password": "$2b$10$G80S4Dh.fGU.kSZ6IcJ90ejstMrt4abUq/n11B2cuqyH2YTlhFTNy"
+    }
+  ],
+  "scores": [
+    {
+      "id": "62599354-78ff-49c8-a40a-c359534fe31e",
+      "userId": "a1bd96b0-c36d-44e3-9521-4904cd31142c",
+      "score": 18,
+      "date": "2026-04-01T16:32:35.304Z"
+    }
+  ],
+  "charities": [
+    {
+      "id": "88ed3127-8078-429c-8039-7f5f9c28d802",
+      "name": "First Tee Youth Fund",
+      "description": "Expands access to golf, mentorship, and life-skills coaching for young players."
+    },
+    {
+      "id": "d4397713-9635-4d83-aaac-fa59c2eea24b",
+      "name": "Greens for Good Foundation",
+      "description": "Supports local families through emergency grants and community wellness programs."
+    },
+    {
+      "id": "f0bfe3fd-7b6f-4e88-a7e7-cbac6703cff9",
+      "name": "Fairway Futures Trust",
+      "description": "Funds junior sports scholarships and school-based recreation initiatives."
+    }
+  ]
+}
