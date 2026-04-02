@@ -1,13 +1,20 @@
-const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
+const API_BASE_URL = `${(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "")}/api`;
 
 async function request(path, options = {}) {
+  const {
+    token,
+    headers = {},
+    method = "GET",
+    ...restOptions
+  } = options;
   const response = await fetch(`${API_BASE_URL}${path}`, {
+    method,
+    ...restOptions,
     headers: {
       "Content-Type": "application/json",
-      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-      ...(options.headers || {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
     },
-    ...options,
   });
 
   const contentType = response.headers.get("content-type") || "";
@@ -17,8 +24,8 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const message =
-      typeof payload === "object" && payload !== null && payload.msg
-        ? payload.msg
+      typeof payload === "object" && payload !== null
+        ? payload.msg || payload.message || payload.error
         : "Something went wrong while talking to the server.";
 
     const error = new Error(message);
@@ -36,11 +43,24 @@ export const signup = (data) =>
     body: JSON.stringify(data),
   });
 
-export const login = (data) =>
-  request("/auth/login", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+export const login = async ({ email, password }) => {
+  try {
+    return await request("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (error) {
+    const message =
+      error.status === 405
+        ? "Login endpoint rejected the request method. Check that the backend accepts POST on /api/auth/login."
+        : error.message;
+
+    const loginError = new Error(message);
+    loginError.status = error.status;
+    loginError.payload = error.payload;
+    throw loginError;
+  }
+};
 
 export const getCurrentUser = (token) =>
   request("/auth/me", {
