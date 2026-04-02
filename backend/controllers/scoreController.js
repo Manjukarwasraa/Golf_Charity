@@ -2,6 +2,9 @@ const Score = require("../models/Score");
 const { isMongoReady } = require("../lib/dbState");
 const { addScore: addLocalScore, getScoresByUser } = require("../lib/localStore");
 
+const getRecentScoresQuery = (userId) =>
+  Score.find({ userId }).sort({ date: -1, _id: -1 }).limit(5);
+
 const addScore = async (req, res) => {
   const { score } = req.body;
   const parsedScore = Number(score);
@@ -11,18 +14,20 @@ const addScore = async (req, res) => {
   }
 
   if (isMongoReady()) {
-    const newScore = new Score({
+    await Score.create({
       userId: req.user.id,
       score: parsedScore,
-      date: new Date(),
     });
 
-    await newScore.save();
+    const scoresToRemove = await Score.find({ userId: req.user.id })
+      .sort({ date: -1, _id: -1 })
+      .skip(5)
+      .select("_id");
 
-    const scores = await Score.find({ userId: req.user.id }).sort({ date: -1 });
-
-    if (scores.length > 5) {
-      await Score.findByIdAndDelete(scores[5]._id);
+    if (scoresToRemove.length) {
+      await Score.deleteMany({
+        _id: { $in: scoresToRemove.map((item) => item._id) },
+      });
     }
   } else {
     addLocalScore(req.user.id, parsedScore);
@@ -32,7 +37,7 @@ const addScore = async (req, res) => {
 
 const getScores = async (req, res) => {
   const scores = isMongoReady()
-    ? await Score.find({ userId: req.user.id }).sort({ date: -1 })
+    ? await getRecentScoresQuery(req.user.id)
     : getScoresByUser(req.user.id);
   res.json(scores);
 };

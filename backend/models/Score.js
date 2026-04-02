@@ -1,9 +1,18 @@
 const mongoose = require("mongoose");
 
 const scoreSchema = new mongoose.Schema({
-  userId: mongoose.Schema.Types.ObjectId,
-  score: Number,
-  date: Date
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  score: {
+    type: Number,
+    required: true,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 module.exports = mongoose.model("Score", scoreSchema);
