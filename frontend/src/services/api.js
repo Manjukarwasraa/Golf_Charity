@@ -1,6 +1,7 @@
 const isLocalDev =
   typeof window !== "undefined" &&
   (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+const defaultProductionApiUrl = "https://golf-charity-i92l.onrender.com";
 
 const configuredApiUrl =
   process.env.REACT_APP_API_URL ||
@@ -9,7 +10,7 @@ const configuredApiUrl =
 
 const baseApiUrl = isLocalDev
   ? "http://localhost:5000"
-  : configuredApiUrl || window.location.origin;
+  : configuredApiUrl || defaultProductionApiUrl;
 
 const API_BASE_URL = `${baseApiUrl.replace(/\/+$/, "")}/api`;
 
@@ -65,7 +66,7 @@ export const login = async ({ email, password }) => {
   } catch (error) {
     const message =
       error.status === 405
-        ? "Login endpoint rejected the request method. Check that the backend accepts POST on /api/auth/login."
+        ? `Login request reached the wrong server or route. Expected POST ${API_BASE_URL}/auth/login.`
         : error.message;
 
     const loginError = new Error(message);
